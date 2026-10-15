@@ -1,0 +1,235 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* Cobalt Blue Palette */
+    --color-cobalt-deep: #051634;
+    --color-cobalt-dark: #08234d;
+    --color-cobalt-base: #0c336b;
+    --color-cobalt-rich: #114285;
+    --color-cobalt-royal: #1855a8;
+    --color-cobalt-vivid: #1e64c8;
+    
+    /* Ice Blue Palette */
+    --color-ice-pale: #f0f9ff;
+    --color-ice-light: #e0f2fe;
+    --color-ice-base: #bae6fd;
+    --color-ice-accent: #7dd3fc;
+    --color-ice-neon: #38bdf8;
+    --color-ice-cyan: #0284c7;
+
+    /* Semantic tokens */
+    --brand-primary: #1e64c8;
+    --brand-dark: #08234d;
+    --brand-navy: #051634;
+    --brand-accent: #38bdf8;
+    --brand-glow: #7dd3fc;
+    --brand-light: #e0f2fe;
+    --brand-surface: #0c336b;
+  }
+
+  html {
+    font-size: 105%;
+    -webkit-text-size-adjust: 105%;
+    text-size-adjust: 105%;
+  }
+
+  * {
+    border-color: rgba(56, 189, 248, 0.2);
+  }
+
+  body {
+    /* Rich Cobalt Blue Canvas */
+    background: radial-gradient(circle at 50% -5%, #18529e 0%, #0d3670 26%, #08244f 60%, #051634 100%) fixed;
+    background-color: #08244f;
+    color: #f0f9ff;
+    font-family: 'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    letter-spacing: 0.012em;
+  }
+
+  #root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 0;
+    text-align: left;
+    border: none;
+    background: transparent;
+  }
+}
+
+/* Glassmorphism & Cobalt / Ice Blue Custom Classes */
+.bg-cobalt-card {
+  background: rgba(12, 43, 85, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+}
+
+.bg-cobalt-card:hover {
+  border-color: rgba(125, 211, 252, 0.55);
+}
+
+.bg-cobalt-card-solid {
+  background: #0d346b;
+  border: 1px solid rgba(56, 189, 248, 0.22);
+}
+
+.bg-cobalt-input {
+  background: rgba(7, 26, 54, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #f0f9ff;
+}
+
+.bg-cobalt-input:focus {
+  border-color: #38bdf8;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+}
+
+.ice-glow {
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.35), 0 0 50px rgba(14, 165, 233, 0.15);
+}
+
+.ice-glow-sm {
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.28);
+}
+
+.ice-text-gradient {
+  background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 45%, #7dd3fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.cobalt-text-gradient {
+  background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 50%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ice-border-pulse {
+  animation: icePulse 3s infinite ease-in-out;
+}
+
+@keyframes icePulse {
+  0%, 100% {
+    border-color: rgba(56, 189, 248, 0.3);
+  }
+  50% {
+    border-color: rgba(125, 211, 252, 0.85);
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+  }
+}
+
+/* Custom modern scrollbar in Cobalt & Ice Blue */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #051634;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #164687;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #38bdf8;
+}
+
+/* 3D and Micro-Touch Interaction Utilities */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.perspective-1200 {
+  perspective: 1200px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* Micro-touch and click feedback */
+button:active:not(:disabled),
+.touch-press:active {
+  transform: scale(0.97) translateY(1px);
+}
+
+a:active {
+  transform: scale(0.98);
+}
+
+/* Floating 3D Levitation Keyframe */
+@keyframes levitate3D {
+  0%, 100% {
+    transform: translateY(0px) rotateX(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotateX(2deg);
+  }
+}
+
+.animate-levitate-3d {
+  animation: levitate3D 5s ease-in-out infinite;
+}
+
+/* 8 to 10 Second (9s) Outline Sketching Animation for Logo */
+@keyframes sketchLoop9s {
+  0% {
+    stroke-dashoffset: 600;
+    opacity: 0.2;
+    filter: drop-shadow(0 0 2px #38bdf8);
+  }
+  30% {
+    stroke-dashoffset: 400;
+    opacity: 0.8;
+    filter: drop-shadow(0 0 6px #38bdf8);
+  }
+  70% {
+    stroke-dashoffset: 150;
+    opacity: 1;
+    filter: drop-shadow(0 0 8px #facc15);
+  }
+  88% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+    filter: drop-shadow(0 0 12px #facc15);
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.9;
+    filter: drop-shadow(0 0 5px #38bdf8);
+  }
+}
+
+@keyframes sketchLaserTravel9s {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-sketch-9s {
+  stroke-dasharray: 600;
+  animation: sketchLoop9s 9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-sketch-laser-9s {
+  animation: sketchLaserTravel9s 9s linear infinite;
+}
+

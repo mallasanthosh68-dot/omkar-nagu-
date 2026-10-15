@@ -1,0 +1,71 @@
+// Prisma Schema for OMKAR NAGU ELECTRICAL WORKS
+// Works with Supabase / PostgreSQL or local database
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum BookingStatus {
+  NEW
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id           String        @id @default(uuid())
+  name         String
+  phone        String        @unique
+  address      String
+  passwordHash String
+  role         Role          @default(CUSTOMER)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  bookings     Booking[]
+
+  @@map("users")
+}
+
+model Service {
+  id          String    @id @default(uuid())
+  category    String
+  name        String
+  description String
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+
+  @@map("services")
+}
+
+model Booking {
+  id            String        @id @default(uuid())
+  bookingNumber String        @unique
+  customerId    String
+  customer      User          @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerName  String?
+  customerPhone String?
+  serviceId     String?
+  category      String
+  serviceName   String
+  address       String
+  preferredDate String
+  preferredTime String
+  description   String
+  imageUrl      String?
+  status        BookingStatus @default(NEW)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@map("bookings")
+}

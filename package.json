@@ -1,0 +1,29 @@
+{
+  "name": "omkar-nagu-electrical-works",
+  "version": "1.0.0",
+  "description": "Full-Stack Enterprise Electrical Services Website & Admin Portal",
+  "private": true,
+  "scripts": {
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:frontend": "npm --prefix frontend run build",
+    "build:backend": "npm --prefix backend run build",
+    "db:push": "npm --prefix backend run prisma:push",
+    "db:generate": "npm --prefix backend run prisma:generate",
+    "install:all": "npm install --prefix backend && npm install --prefix frontend"
+  },
+  "keywords": [
+    "electrical-works",
+    "react",
+    "typescript",
+    "vite",
+    "tailwind",
+    "threejs",
+    "express",
+    "prisma",
+    "supabase"
+  ],
+  "author": "Omkar Nagu Electrical Works",
+  "license": "ISC"
+}
