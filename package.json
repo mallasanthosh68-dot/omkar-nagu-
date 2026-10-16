@@ -6,6 +6,7 @@
   "scripts": {
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev",
+    "postinstall": "npx prisma generate --schema=backend/prisma/schema.prisma",
     "build": "npm --prefix backend run prisma:generate && npm --prefix backend run build && npm --prefix frontend run build",
     "vercel-build": "npm --prefix backend run prisma:generate && npm --prefix frontend run build",
     "build:frontend": "npm --prefix frontend run build",
