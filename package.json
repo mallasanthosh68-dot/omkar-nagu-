@@ -6,12 +6,35 @@
   "scripts": {
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev",
-    "build": "npm run build:backend && npm run build:frontend",
+    "build": "npm --prefix backend run prisma:generate && npm --prefix backend run build && npm --prefix frontend run build",
+    "vercel-build": "npm --prefix backend run prisma:generate && npm --prefix frontend run build",
     "build:frontend": "npm --prefix frontend run build",
     "build:backend": "npm --prefix backend run build",
     "db:push": "npm --prefix backend run prisma:push",
     "db:generate": "npm --prefix backend run prisma:generate",
     "install:all": "npm install --prefix backend && npm install --prefix frontend"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.4.1",
+    "@supabase/supabase-js": "^2.49.1",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^22.13.9",
+    "@vercel/node": "^24.0.2",
+    "prisma": "^6.4.1",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
   },
   "keywords": [
     "electrical-works",
@@ -22,7 +45,8 @@
     "threejs",
     "express",
     "prisma",
-    "supabase"
+    "supabase",
+    "vercel"
   ],
   "author": "Omkar Nagu Electrical Works",
   "license": "ISC"
