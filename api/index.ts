@@ -1,17 +1,28 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import app from '../backend/src/app.js';
-import { initDb } from '../backend/src/config/db.js';
 
 let isDbInitialized = false;
+let appInstance: any = null;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (!isDbInitialized) {
+  if (!appInstance) {
     try {
-      await initDb();
-      isDbInitialized = true;
+      const appModule = await import('../backend/src/app.js');
+      appInstance = appModule.app || appModule.default;
+      
+      const dbModule = await import('../backend/src/config/db.js');
+      if (!isDbInitialized && dbModule.initDb) {
+        await dbModule.initDb();
+        isDbInitialized = true;
+      }
     } catch (err) {
-      console.error('Error during initDb in Vercel Serverless Function:', err);
+      console.error('Error initializing serverless app in api/index.ts:', err);
+      return res.status(500).json({
+        success: false,
+        message: 'Serverless initialization failed',
+        error: String(err)
+      });
     }
   }
-  return app(req, res);
+
+  return appInstance(req, res);
 }

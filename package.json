@@ -1,6 +1,7 @@
 {
   "name": "omkar-nagu-electrical-works",
   "version": "1.0.0",
+  "type": "module",
   "description": "Full-Stack Enterprise Electrical Services Website & Admin Portal",
   "private": true,
   "scripts": {
