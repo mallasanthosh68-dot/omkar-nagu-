@@ -13,32 +13,49 @@ import { PageTransition } from './components/effects/PageTransition';
 import { LogoSketchModal } from './components/effects/LogoSketchModal';
 import { IntroLogoSketchSplash } from './components/effects/IntroLogoSketchSplash';
 
-// Public Pages
-
+// Keep HomePage instant/eager for instant 0ms first render
 import { HomePage } from './pages/public/HomePage';
-import { ServicesPage } from './pages/public/ServicesPage';
-import { AboutPage } from './pages/public/AboutPage';
-import { ContactPage } from './pages/public/ContactPage';
-import { LoginPage } from './pages/public/LoginPage';
-import { RegisterPage } from './pages/public/RegisterPage';
-import { AdminLoginPage } from './pages/public/AdminLoginPage';
 
-// Customer Pages
-import { CustomerDashboard } from './pages/customer/CustomerDashboard';
-import { MyBookingsPage } from './pages/customer/MyBookingsPage';
-import { CustomerProfilePage } from './pages/customer/CustomerProfilePage';
+// Lazy-loaded routes for ultra-fast initial page load
+const ServicesPage = React.lazy(() => import('./pages/public/ServicesPage').then(m => ({ default: m.ServicesPage })));
+const AboutPage = React.lazy(() => import('./pages/public/AboutPage').then(m => ({ default: m.AboutPage })));
+const ContactPage = React.lazy(() => import('./pages/public/ContactPage').then(m => ({ default: m.ContactPage })));
+const LoginPage = React.lazy(() => import('./pages/public/LoginPage').then(m => ({ default: m.LoginPage })));
+const RegisterPage = React.lazy(() => import('./pages/public/RegisterPage').then(m => ({ default: m.RegisterPage })));
+const AdminLoginPage = React.lazy(() => import('./pages/public/AdminLoginPage').then(m => ({ default: m.AdminLoginPage })));
 
-// Admin Pages & Layout
-import { AdminLayout } from './components/admin/AdminLayout';
-import { AdminDashboard } from './pages/admin/AdminDashboard';
-import { AdminBookingsPage } from './pages/admin/AdminBookingsPage';
-import { AdminCustomersPage } from './pages/admin/AdminCustomersPage';
-import { AdminServicesPage } from './pages/admin/AdminServicesPage';
+// Customer Pages (Lazy Loaded)
+const CustomerDashboard = React.lazy(() => import('./pages/customer/CustomerDashboard').then(m => ({ default: m.CustomerDashboard })));
+const MyBookingsPage = React.lazy(() => import('./pages/customer/MyBookingsPage').then(m => ({ default: m.MyBookingsPage })));
+const CustomerProfilePage = React.lazy(() => import('./pages/customer/CustomerProfilePage').then(m => ({ default: m.CustomerProfilePage })));
+
+// Admin Pages & Layout (Lazy Loaded)
+const AdminLayout = React.lazy(() => import('./components/admin/AdminLayout').then(m => ({ default: m.AdminLayout })));
+const AdminDashboard = React.lazy(() => import('./pages/admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const AdminBookingsPage = React.lazy(() => import('./pages/admin/AdminBookingsPage').then(m => ({ default: m.AdminBookingsPage })));
+const AdminCustomersPage = React.lazy(() => import('./pages/admin/AdminCustomersPage').then(m => ({ default: m.AdminCustomersPage })));
+const AdminServicesPage = React.lazy(() => import('./pages/admin/AdminServicesPage').then(m => ({ default: m.AdminServicesPage })));
+
+// High-performance loading indicator
+const PageLoader: React.FC = () => (
+  <div className="min-h-[50vh] flex flex-col items-center justify-center p-8 text-center">
+    <div className="relative w-14 h-14 flex items-center justify-center mb-3">
+      <div className="absolute inset-0 rounded-full border-2 border-sky-400/20 animate-ping" />
+      <div className="w-10 h-10 rounded-full border-2 border-transparent border-t-amber-400 border-r-sky-400 animate-spin" />
+      <div className="w-5 h-5 rounded-full bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-amber-300 text-xs">
+        ⚡
+      </div>
+    </div>
+    <p className="text-xs font-semibold tracking-wider text-sky-200/80 uppercase animate-pulse">
+      Loading Omkar Nagu Electricals...
+    </p>
+  </div>
+);
 
 // Protected Route Guards
 const CustomerProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isCustomer, isLoading } = useAuth();
-  if (isLoading) return <div className="min-h-screen bg-[#08234d] flex items-center justify-center text-sky-200">Loading customer portal...</div>;
+  if (isLoading) return <PageLoader />;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (!isCustomer) return <Navigate to="/admin/dashboard" replace />;
   return <>{children}</>;
@@ -46,7 +63,7 @@ const CustomerProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ child
 
 const AdminProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isAdmin, isLoading } = useAuth();
-  if (isLoading) return <div className="min-h-screen bg-[#08234d] flex items-center justify-center text-sky-200">Loading admin operations...</div>;
+  if (isLoading) return <PageLoader />;
   if (!isAuthenticated || !isAdmin) return <Navigate to="/admin/login" replace />;
   return <>{children}</>;
 };
@@ -148,113 +165,112 @@ const MainAppContent: React.FC = () => {
 
       <main className="flex-1 relative z-10">
         <PageTransition>
-          <Routes location={location}>
-          {/* Public Routes */}
-          <Route
-            path="/"
-            element={
-              <HomePage
-                onOpenBooking={handleOpenBooking}
-                onOpenSketch={() => setShowIntroSplash(true)}
+          <React.Suspense fallback={<PageLoader />}>
+            <Routes location={location}>
+              {/* Public Routes */}
+              <Route
+                path="/"
+                element={
+                  <HomePage
+                    onOpenBooking={handleOpenBooking}
+                    onOpenSketch={() => setShowIntroSplash(true)}
+                  />
+                }
               />
-            }
-          />
 
-          <Route path="/services" element={<ServicesPage onOpenBooking={handleOpenBooking} />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<ContactPage onOpenBooking={() => handleOpenBooking()} />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/admin/login" element={<AdminLoginPage />} />
+              <Route path="/services" element={<ServicesPage onOpenBooking={handleOpenBooking} />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage onOpenBooking={() => handleOpenBooking()} />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/admin/login" element={<AdminLoginPage />} />
 
-          {/* Customer Portal Routes (Protected) */}
-          <Route
-            path="/dashboard"
-            element={
-              <CustomerProtectedRoute>
-                <CustomerDashboard
-                  onOpenBooking={handleOpenBooking}
-                  onOpenBookingDetails={handleOpenBookingDetails}
-                />
-              </CustomerProtectedRoute>
-            }
-          />
-          <Route
-            path="/my-bookings"
-            element={
-              <CustomerProtectedRoute>
-                <MyBookingsPage
-                  onOpenBooking={() => handleOpenBooking()}
-                  onOpenBookingDetails={handleOpenBookingDetails}
-                />
-              </CustomerProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <CustomerProtectedRoute>
-                <CustomerProfilePage />
-              </CustomerProtectedRoute>
-            }
-          />
-          <Route
-            path="/book"
-            element={
-              <CustomerProtectedRoute>
-                <CustomerDashboard
-                  onOpenBooking={handleOpenBooking}
-                  onOpenBookingDetails={handleOpenBookingDetails}
-                />
-              </CustomerProtectedRoute>
-            }
-          />
+              {/* Seamless Requirement Intake Booking Route */}
+              <Route
+                path="/book"
+                element={
+                  <ServicesPage onOpenBooking={handleOpenBooking} />
+                }
+              />
 
-          {/* Admin Portal Routes (Protected with Admin Role) */}
-          <Route
-            path="/admin/dashboard"
-            element={
-              <AdminProtectedRoute>
-                <AdminLayout>
-                  <AdminDashboard onOpenBookingDetails={handleOpenBookingDetails} />
-                </AdminLayout>
-              </AdminProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/bookings"
-            element={
-              <AdminProtectedRoute>
-                <AdminLayout>
-                  <AdminBookingsPage onOpenBookingDetails={handleOpenBookingDetails} />
-                </AdminLayout>
-              </AdminProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/customers"
-            element={
-              <AdminProtectedRoute>
-                <AdminLayout>
-                  <AdminCustomersPage onOpenBookingDetails={handleOpenBookingDetails} />
-                </AdminLayout>
-              </AdminProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/services"
-            element={
-              <AdminProtectedRoute>
-                <AdminLayout>
-                  <AdminServicesPage />
-                </AdminLayout>
-              </AdminProtectedRoute>
-            }
-          />
+              {/* Customer Portal Routes (Protected) */}
+              <Route
+                path="/dashboard"
+                element={
+                  <CustomerProtectedRoute>
+                    <CustomerDashboard
+                      onOpenBooking={handleOpenBooking}
+                      onOpenBookingDetails={handleOpenBookingDetails}
+                    />
+                  </CustomerProtectedRoute>
+                }
+              />
+              <Route
+                path="/my-bookings"
+                element={
+                  <CustomerProtectedRoute>
+                    <MyBookingsPage
+                      onOpenBooking={() => handleOpenBooking()}
+                      onOpenBookingDetails={handleOpenBookingDetails}
+                    />
+                  </CustomerProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <CustomerProtectedRoute>
+                    <CustomerProfilePage />
+                  </CustomerProtectedRoute>
+                }
+              />
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+              {/* Admin Portal Routes (Protected with Admin Role) */}
+              <Route
+                path="/admin/dashboard"
+                element={
+                  <AdminProtectedRoute>
+                    <AdminLayout>
+                      <AdminDashboard onOpenBookingDetails={handleOpenBookingDetails} />
+                    </AdminLayout>
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/bookings"
+                element={
+                  <AdminProtectedRoute>
+                    <AdminLayout>
+                      <AdminBookingsPage onOpenBookingDetails={handleOpenBookingDetails} />
+                    </AdminLayout>
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/customers"
+                element={
+                  <AdminProtectedRoute>
+                    <AdminLayout>
+                      <AdminCustomersPage onOpenBookingDetails={handleOpenBookingDetails} />
+                    </AdminLayout>
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/services"
+                element={
+                  <AdminProtectedRoute>
+                    <AdminLayout>
+                      <AdminServicesPage />
+                    </AdminLayout>
+                  </AdminProtectedRoute>
+                }
+              />
+
+              {/* Fallback */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </React.Suspense>
         </PageTransition>
       </main>
 

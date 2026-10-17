@@ -70,7 +70,7 @@ let memoryDb: DatabaseSchema = {
   users: [],
   services: [...INITIAL_SERVICES],
   bookings: [],
-  nextBookingIdNumber: 1025
+  nextBookingIdNumber: 1001
 };
 
 // Prisma to App Model mappers
@@ -274,66 +274,6 @@ export const initDb = async () => {
       updatedAt: new Date().toISOString()
     };
     memoryDb.users.push(adminUser);
-  }
-
-  // Ensure default demo customer exists
-  const demoCustomer = memoryDb.users.find(u => u.phone === '9988776655');
-  if (!demoCustomer) {
-    const custSalt = await bcrypt.genSalt(10);
-    const custPasswordHash = await bcrypt.hash('Customer@123', custSalt);
-    const customerUser: UserRecord = {
-      id: 'demo-customer-id',
-      name: 'Santhosh Kumar',
-      phone: '9988776655',
-      address: 'Plot 42, MVP Colony, Visakhapatnam, Andhra Pradesh',
-      passwordHash: custPasswordHash,
-      role: 'CUSTOMER',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    memoryDb.users.push(customerUser);
-
-    if (memoryDb.bookings.length === 0) {
-      memoryDb.bookings = [
-        {
-          id: 'b-1020',
-          bookingNumber: 'ON-EW-1020',
-          customerId: 'demo-customer-id',
-          customerName: 'Santhosh Kumar',
-          customerPhone: '9988776655',
-          serviceId: 'wire-house',
-          category: 'Wiring',
-          serviceName: 'House Wiring',
-          address: 'Plot 42, MVP Colony, Visakhapatnam, Andhra Pradesh',
-          preferredDate: '2026-10-15',
-          preferredTime: '10:00 AM',
-          description: 'Complete electrical wiring and conduit installation for newly constructed ground floor villa.',
-          imageUrl: null,
-          status: 'NEW',
-          createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
-          updatedAt: new Date(Date.now() - 3600000 * 2).toISOString()
-        },
-        {
-          id: 'b-1021',
-          bookingNumber: 'ON-EW-1021',
-          customerId: 'demo-customer-id',
-          customerName: 'Santhosh Kumar',
-          customerPhone: '9988776655',
-          serviceId: 'light-chandelier',
-          category: 'Ceiling & Lighting',
-          serviceName: 'Chandelier Installation',
-          address: 'Plot 42, MVP Colony, Visakhapatnam, Andhra Pradesh',
-          preferredDate: '2026-10-16',
-          preferredTime: '02:00 PM',
-          description: 'Heavy living room double-tier crystal chandelier hanging and dedicated dimmer connection.',
-          imageUrl: null,
-          status: 'CONFIRMED',
-          createdAt: new Date(Date.now() - 3600000 * 24).toISOString(),
-          updatedAt: new Date(Date.now() - 3600000 * 18).toISOString()
-        }
-      ];
-      memoryDb.nextBookingIdNumber = 1025;
-    }
   }
 
   if (!memoryDb.services || memoryDb.services.length === 0) {
@@ -743,6 +683,28 @@ export const dbStore = {
       inProgress,
       completed,
       cancelled
+    };
+  },
+
+  clearAllCustomersAndBookings: async () => {
+    if (isPrismaConnected && prisma) {
+      try {
+        await prisma.booking.deleteMany();
+        await prisma.user.deleteMany({
+          where: { role: 'CUSTOMER' }
+        });
+      } catch (e) {
+        console.warn('Prisma clear customers/bookings fallback:', e);
+      }
+    }
+
+    memoryDb.users = memoryDb.users.filter(u => u.role === 'ADMIN');
+    memoryDb.bookings = [];
+    memoryDb.nextBookingIdNumber = 1001;
+    saveDb();
+    return {
+      success: true,
+      message: 'All customer accounts and booking records have been wiped clean.'
     };
   }
 };

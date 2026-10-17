@@ -23,6 +23,7 @@ interface AuthContextType {
   register: (data: RegisterData) => Promise<{ success: boolean; message: string; user?: User }>;
   logout: () => void;
   updateUser: (updatedUser: Partial<User>) => void;
+  setAuthSession: (user: User, token: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -160,6 +161,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const setAuthSession = (newUser: User, newToken: string) => {
+    setUser(newUser);
+    setToken(newToken);
+    localStorage.setItem('omkar_user', JSON.stringify(newUser));
+    localStorage.setItem('omkar_token', newToken);
+  };
+
   const role = user?.role || null;
   const isAuthenticated = !!user && !!token;
   const isAdmin = user?.role === 'ADMIN';
@@ -179,7 +187,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         adminLogin,
         register,
         logout,
-        updateUser
+        updateUser,
+        setAuthSession
       }}
     >
       {children}

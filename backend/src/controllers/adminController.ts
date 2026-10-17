@@ -150,3 +150,12 @@ export const getCustomerDetails = async (req: Request, res: Response): Promise<v
     res.status(500).json({ success: false, message: 'Failed to retrieve customer details.' });
   }
 };
+
+export const clearCustomerData = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const result = await dbStore.clearAllCustomersAndBookings();
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to wipe customer data.' });
+  }
+};

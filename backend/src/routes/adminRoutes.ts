@@ -5,7 +5,8 @@ import {
   getAdminBookingDetails,
   updateBookingStatus,
   getCustomersList,
-  getCustomerDetails
+  getCustomerDetails,
+  clearCustomerData
 } from '../controllers/adminController.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.js';
 
@@ -20,5 +21,6 @@ router.get('/bookings/:id', getAdminBookingDetails);
 router.patch('/bookings/:id/status', updateBookingStatus);
 router.get('/customers', getCustomersList);
 router.get('/customers/:id', getCustomerDetails);
+router.post('/clear-data', clearCustomerData);
 
 export default router;

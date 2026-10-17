@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { createBooking, getMyBookings, getBookingById } from '../controllers/bookingController.js';
-import { requireAuth } from '../middleware/auth.js';
+import { requireAuth, optionalAuth } from '../middleware/auth.js';
 
 const router = Router();
 
-router.post('/', requireAuth, createBooking);
+router.post('/', optionalAuth, createBooking);
 router.get('/my', requireAuth, getMyBookings);
 router.get('/:id', requireAuth, getBookingById);
 

@@ -46,7 +46,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   preselectedService,
   onBookingSuccess
 }) => {
-  const { user, token, isAuthenticated } = useAuth();
+  const { user, token, setAuthSession } = useAuth();
 
   // Steps: 'form' | 'confirm' | 'success'
   const [step, setStep] = useState<'form' | 'confirm' | 'success'>('form');
@@ -186,28 +186,28 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       setSelectedFile(file);
       setFilePreview(URL.createObjectURL(file));
 
-      // Upload if token is available
-      if (token) {
-        setIsUploadingPhoto(true);
-        const formData = new FormData();
-        formData.append('photo', file);
-        try {
-          const res = await fetch(getApiUrl('/api/upload'), {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`
-            },
-            body: formData
-          });
-          const data = await res.json();
-          if (data.success) {
-            setUploadedImageUrl(data.url);
-          }
-        } catch (err) {
-          console.warn('Image upload failed, proceeding without preview URL:', err);
-        } finally {
-          setIsUploadingPhoto(false);
+      // Upload photo to backend
+      setIsUploadingPhoto(true);
+      const formData = new FormData();
+      formData.append('photo', file);
+      try {
+        const headers: Record<string, string> = {};
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
         }
+        const res = await fetch(getApiUrl('/api/upload'), {
+          method: 'POST',
+          headers,
+          body: formData
+        });
+        const data = await res.json();
+        if (data.success && data.url) {
+          setUploadedImageUrl(data.url);
+        }
+      } catch (err) {
+        console.warn('Image upload failed, proceeding without preview URL:', err);
+      } finally {
+        setIsUploadingPhoto(false);
       }
     }
   };
@@ -245,11 +245,6 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   };
 
   const handleConfirmBooking = async () => {
-    if (!token) {
-      setErrorMsg('Session expired. Please login again to book.');
-      return;
-    }
-
     setSubmitting(true);
     setErrorMsg('');
 
@@ -258,27 +253,36 @@ export const BookingModal: React.FC<BookingModalProps> = ({
         category,
         serviceName: finalServiceName,
         selectedServices: computedServicesList,
-        customerName: name,
-        customerPhone: phone,
-        address,
+        customerName: name.trim(),
+        customerPhone: phone.trim(),
+        address: address.trim(),
         preferredDate,
         preferredTime,
         description: roomArea ? `${description} (Estimated Area/Rooms: ${roomArea})` : description,
         imageUrl: uploadedImageUrl
       };
 
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const res = await fetch(getApiUrl('/api/bookings'), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers,
         body: JSON.stringify(payload)
       });
 
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.message || 'Booking submission failed.');
+      }
+
+      // If user was a guest and backend generated an auto-token/account, log them in seamlessly!
+      if (data.token && data.user && !token) {
+        setAuthSession(data.user, data.token);
       }
 
       setConfirmedBooking(data.booking);
