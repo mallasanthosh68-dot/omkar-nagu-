@@ -2,7 +2,15 @@
 
 const envApiUrl = import.meta.env.VITE_API_URL;
 
-export const API_BASE_URL: string = (envApiUrl || '').replace(/\/+$/, '');
+// In production on Vercel, use relative paths ('') so requests route seamlessly to same-origin /api/*
+export const API_BASE_URL: string = (() => {
+  if (import.meta.env.PROD) {
+    if (!envApiUrl || envApiUrl.includes('localhost') || envApiUrl.includes('127.0.0.1')) {
+      return '';
+    }
+  }
+  return (envApiUrl || '').replace(/\/+$/, '');
+})();
 
 export const getApiUrl = (endpoint: string): string => {
   if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {

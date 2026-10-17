@@ -4,6 +4,11 @@ let isDbInitialized = false;
 let appInstance: any = null;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Normalize req.url so Express receives the full requested endpoint if rewritten by Vercel
+  const reqAny = req as any;
+  if (reqAny.originalUrl && req.url !== reqAny.originalUrl) {
+    req.url = reqAny.originalUrl;
+  }
   if (!appInstance) {
     try {
       const appModule = await import('../backend/src/app.js');

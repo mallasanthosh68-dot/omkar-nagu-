@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import bcrypt from 'bcryptjs';
-import { PrismaClient } from '@prisma/client';
 import { INITIAL_SERVICES, ServiceItem } from '../data/initialServices.js';
 import { fileURLToPath } from 'url';
 
@@ -62,11 +61,8 @@ const resolveDbPaths = () => {
 
 const { dataDir: DATA_DIR, dbFile: DB_FILE } = resolveDbPaths();
 
-// Initialize Prisma client for Supabase PostgreSQL
-export const prisma = new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error']
-});
-
+// Prisma client for Supabase PostgreSQL (dynamically connected when DATABASE_URL is present)
+export let prisma: any = null;
 export let isPrismaConnected = false;
 
 // In-memory + persistent store ensuring rock-solid availability in any environment
@@ -156,6 +152,13 @@ export const initDb = async () => {
   // 2. Try connecting to Supabase / PostgreSQL via Prisma if DATABASE_URL is set
   if (process.env.DATABASE_URL) {
     try {
+      const prismaModule = await import('@prisma/client');
+      const PrismaClientClass = prismaModule.PrismaClient;
+      if (!prisma) {
+        prisma = new PrismaClientClass({
+          log: process.env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error']
+        });
+      }
       await prisma.$connect();
       isPrismaConnected = true;
       console.log('⚡ Connected to Supabase / PostgreSQL database successfully via Prisma.');
@@ -478,7 +481,7 @@ export const dbStore = {
           where: { role: 'CUSTOMER' },
           orderBy: { createdAt: 'desc' }
         });
-        return customers.map(c => {
+        return customers.map((c: any) => {
           const { passwordHash, ...rest } = mapPrismaUser(c);
           return rest;
         });
