@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Logo } from '../../components/common/Logo';
-import { Shield, Phone, Lock, AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
+import { Shield, User, Lock, AlertCircle, ArrowRight, Sparkles, Eye, EyeOff, Copy, Check } from 'lucide-react';
 import { Login3DNode } from '../../components/3d/Login3DNode';
 import { TiltCard } from '../../components/effects/TiltCard';
 import { BackButton } from '../../components/common/BackButton';
 
 export const AdminLoginPage: React.FC = () => {
-  const [phone, setPhone] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -22,22 +24,28 @@ export const AdminLoginPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const res = await adminLogin(phone, password);
+      const res = await adminLogin(username, password);
       if (res.user?.role !== 'ADMIN') {
         setErrorMsg('Access Denied: This account does not possess administrative privileges.');
         return;
       }
       navigate('/admin/dashboard', { replace: true });
     } catch (err: any) {
-      setErrorMsg(err.message || 'Authentication failed. Please verify admin username/email and password.');
+      setErrorMsg(err.message || 'Authentication failed. Please verify admin username and password.');
     } finally {
       setLoading(false);
     }
   };
 
-  const fillDemoAdmin = () => {
-    setPhone('naguomkar@service.com');
+  const fillAdminCredentials = () => {
+    setUsername('naguomkar@service.com');
     setPassword('26152215');
+  };
+
+  const copyAdminCredentials = () => {
+    navigator.clipboard.writeText('Username: naguomkar@service.com\nPassword: 26152215');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -70,32 +78,49 @@ export const AdminLoginPage: React.FC = () => {
         <div className="flex flex-col items-center justify-center -my-3">
           <Login3DNode
             isLoading={loading}
-            isTyping={phone.length > 0 || password.length > 0}
+            isTyping={username.length > 0 || password.length > 0}
             mode="admin"
           />
           <div className="flex items-center gap-1.5 text-[11px] text-sky-300/80 -mt-2">
-            <span className={`w-2 h-2 rounded-full ${loading ? 'bg-amber-400 animate-ping' : phone.length > 0 || password.length > 0 ? 'bg-sky-400 animate-pulse' : 'bg-emerald-400'}`} />
-            <span>{loading ? 'Decrypting Admin Encryption...' : phone.length > 0 || password.length > 0 ? 'Authorized Cipher Stream Active' : 'Admin Security Power Core Online'}</span>
+            <span className={`w-2 h-2 rounded-full ${loading ? 'bg-amber-400 animate-ping' : username.length > 0 || password.length > 0 ? 'bg-sky-400 animate-pulse' : 'bg-emerald-400'}`} />
+            <span>{loading ? 'Decrypting Admin Encryption...' : username.length > 0 || password.length > 0 ? 'Authorized Cipher Stream Active' : 'Admin Security Power Core Online'}</span>
           </div>
         </div>
 
-        {/* Demo Fast Admin Credentials Helper */}
-        <div className="bg-[#0c2b57]/90 border border-sky-400/35 p-4 rounded-2xl flex items-center justify-between shadow-lg">
-          <div className="text-xs">
-            <span className="font-bold text-sky-300 block flex items-center gap-1">
+        {/* Official Admin Access Credentials Box */}
+        <div className="bg-[#0c2b57]/90 border border-sky-400/35 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
+          <div className="text-xs space-y-0.5">
+            <span className="font-bold text-sky-300 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              Default Admin Credentials:
+              Admin Access Credentials:
             </span>
-            <span className="text-sky-100 font-mono text-xs">Username / Email: naguomkar@service.com</span>
-            <span className="text-sky-100 font-mono text-xs block">Pass: 26152215</span>
+            <div className="text-sky-100 font-mono text-xs">
+              <span className="text-sky-300/70">Username: </span>
+              <strong className="text-white">naguomkar@service.com</strong> <span className="text-sky-400/60">(or admin)</span>
+            </div>
+            <div className="text-sky-100 font-mono text-xs">
+              <span className="text-sky-300/70">Password: </span>
+              <strong className="text-amber-300 font-bold">26152215</strong>
+            </div>
           </div>
-          <button
-            type="button"
-            onClick={fillDemoAdmin}
-            className="px-3 py-1.5 text-xs font-bold bg-sky-400 hover:bg-sky-300 text-slate-950 rounded-xl transition-all shadow-md active:scale-95 hover:scale-105"
-          >
-            Auto-fill
-          </button>
+          <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+            <button
+              type="button"
+              onClick={copyAdminCredentials}
+              className="p-2 text-xs font-semibold bg-[#071c3b] hover:bg-[#0a2752] text-sky-300 border border-sky-400/30 rounded-xl transition-all shadow-sm active:scale-95 flex items-center gap-1"
+              title="Copy credentials"
+            >
+              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copied ? 'Copied' : 'Copy'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={fillAdminCredentials}
+              className="px-3 py-2 text-xs font-bold bg-sky-400 hover:bg-sky-300 text-slate-950 rounded-xl transition-all shadow-md active:scale-95 hover:scale-105"
+            >
+              Auto-fill
+            </button>
+          </div>
         </div>
 
         {/* 3D Tilt Form Card */}
@@ -114,12 +139,13 @@ export const AdminLoginPage: React.FC = () => {
                 Admin Username / Email
               </label>
               <div className="relative">
-                <Phone className="w-4 h-4 absolute left-3.5 top-3 text-sky-400/70" />
+                <User className="w-4 h-4 absolute left-3.5 top-3 text-sky-400/70" />
                 <input
                   type="text"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   placeholder="e.g. naguomkar@service.com or admin"
+                  autoComplete="username"
                   className="w-full bg-[#071c3b]/85 border border-sky-400/30 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 placeholder-sky-300/40 focus:outline-hidden focus:border-sky-400"
                   required
                 />
@@ -133,13 +159,22 @@ export const AdminLoginPage: React.FC = () => {
               <div className="relative">
                 <Lock className="w-4 h-4 absolute left-3.5 top-3 text-sky-400/70" />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter administrator password (26152215)"
-                  className="w-full bg-[#071c3b]/85 border border-sky-400/30 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 placeholder-sky-300/40 focus:outline-hidden focus:border-sky-400"
+                  autoComplete="current-password"
+                  className="w-full bg-[#071c3b]/85 border border-sky-400/30 rounded-xl pl-10 pr-10 py-2.5 text-sm text-slate-100 placeholder-sky-300/40 focus:outline-hidden focus:border-sky-400"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-2.5 p-1 text-sky-400/70 hover:text-sky-200 transition-colors"
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
 

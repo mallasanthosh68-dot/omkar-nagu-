@@ -42,11 +42,6 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const fillDemoCustomer = () => {
-    setPhone('9988776655');
-    setPassword('Customer@123');
-  };
-
   return (
     <div className="min-h-screen py-10 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 bg-transparent text-slate-100">
       {/* Background glow */}
@@ -82,21 +77,6 @@ export const LoginPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Demo Fast Login Helper */}
-        <div className="bg-[#0c2b57]/90 border border-sky-400/35 p-3.5 rounded-xl flex items-center justify-between shadow-lg">
-          <div className="text-xs">
-            <span className="font-bold text-sky-300 block">Demo Customer Account:</span>
-            <span className="text-sky-100">9988776655 • Customer@123</span>
-          </div>
-          <button
-            type="button"
-            onClick={fillDemoCustomer}
-            className="px-3 py-1.5 text-xs font-bold bg-sky-400 hover:bg-sky-300 text-slate-950 rounded-lg shadow-sm transition-all hover:scale-105 active:scale-95"
-          >
-            Auto-fill
-          </button>
-        </div>
-
         {/* 3D Tilt Form Card */}
         <TiltCard maxTilt={3.5} glare={true} className="rounded-2xl">
           <div className="bg-[#0c2b57]/75 border border-sky-400/25 p-8 rounded-2xl shadow-2xl shadow-[#04142b]/60 space-y-6 backdrop-blur-md">
@@ -119,6 +99,7 @@ export const LoginPage: React.FC = () => {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="10-digit mobile number"
+                  autoComplete="off"
                   className="w-full bg-[#071c3b]/85 border border-sky-400/30 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 placeholder-sky-300/40 focus:outline-hidden focus:border-sky-400"
                   required
                 />
@@ -146,6 +127,7 @@ export const LoginPage: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
+                  autoComplete="current-password"
                   className="w-full bg-[#071c3b]/85 border border-sky-400/30 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 placeholder-sky-300/40 focus:outline-hidden focus:border-sky-400"
                   required
                 />

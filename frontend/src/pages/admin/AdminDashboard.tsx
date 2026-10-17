@@ -21,7 +21,10 @@ import {
   RefreshCw,
   Zap,
   TrendingUp,
-  Sparkles
+  Sparkles,
+  Shield,
+  EyeOff,
+  Copy
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -30,6 +33,8 @@ interface AdminDashboardProps {
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onOpenBookingDetails }) => {
   const { token } = useAuth();
+  const [showAdminSecret, setShowAdminSecret] = useState(false);
+  const [secretCopied, setSecretCopied] = useState(false);
 
   const [stats, setStats] = useState<DashboardStats>({
     total: 0,
@@ -131,6 +136,54 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onOpenBookingDet
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
           <span>Refresh Data</span>
+        </button>
+      </div>
+
+      {/* Admin Account & Access Information Card */}
+      <div className="bg-[#0b244d]/85 border border-sky-400/30 p-4 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl backdrop-blur-md">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-sky-500/15 border border-sky-400/30 flex items-center justify-center shrink-0 text-sky-300">
+            <Shield className="w-5 h-5 text-sky-400" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-sky-200 uppercase tracking-wider">
+                Admin Console Credentials
+              </span>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">
+                Logged In Active
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1 mt-1 text-xs">
+              <span className="text-slate-300 font-mono">
+                Username: <strong className="text-white">naguomkar@service.com</strong> <span className="text-sky-300/60">(or admin)</span>
+              </span>
+              <span className="text-slate-300 font-mono flex items-center gap-1.5">
+                Password: <strong className="text-amber-300 font-bold">{showAdminSecret ? '26152215' : '••••••••'}</strong>
+                <button
+                  type="button"
+                  onClick={() => setShowAdminSecret(!showAdminSecret)}
+                  className="p-1 text-sky-400 hover:text-sky-200 transition-colors"
+                  title={showAdminSecret ? 'Hide password' : 'Show password'}
+                >
+                  {showAdminSecret ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                </button>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            navigator.clipboard.writeText('Username: naguomkar@service.com\nPassword: 26152215');
+            setSecretCopied(true);
+            setTimeout(() => setSecretCopied(false), 2000);
+          }}
+          className="self-end md:self-center px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#0c2b57] hover:bg-[#12386e] text-sky-200 border border-sky-400/30 transition-all flex items-center gap-1.5 shrink-0 shadow-sm active:scale-95"
+        >
+          {secretCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-sky-300" />}
+          <span>{secretCopied ? 'Credentials Copied!' : 'Copy Credentials'}</span>
         </button>
       </div>
 
