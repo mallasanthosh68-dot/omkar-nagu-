@@ -40,7 +40,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(() => {
     return localStorage.getItem('omkar_token');
   });
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(() => {
+    try {
+      const savedUser = localStorage.getItem('omkar_user');
+      const savedToken = localStorage.getItem('omkar_token');
+      // If we already have user and token stored in localStorage, start with isLoading = false
+      // so protected routes immediately render without redirection on page reload!
+      return !(savedUser && savedToken);
+    } catch {
+      return true;
+    }
+  });
 
   // Sync state with backend on mount
   useEffect(() => {
@@ -59,11 +69,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               setUser(data.user);
               localStorage.setItem('omkar_user', JSON.stringify(data.user));
             }
-          } else if (res.status === 401 || res.status === 403) {
-            // Token definitively invalid or revoked
-            if (isMounted) logout();
+          } else if (res.status === 401) {
+            // Only logout if token is explicitly expired/invalid from backend
+            try {
+              const errData = await res.json();
+              if (errData?.message && (errData.message.toLowerCase().includes('expired') || errData.message.toLowerCase().includes('invalid token'))) {
+                if (isMounted) logout();
+              }
+            } catch {
+              // Ignore json parse error
+            }
           }
-          // Do not log out on 500 or connection errors so sessions stay valid
+          // Do not log out on 404, 500 or connection errors so sessions stay valid on reload
         } catch (err) {
           console.warn('Network error checking auth status:', err);
         }

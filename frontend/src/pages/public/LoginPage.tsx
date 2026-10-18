@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Logo } from '../../components/common/Logo';
@@ -15,9 +15,20 @@ export const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const whatsappNum = getBusinessWhatsAppNumber();
 
-  const { login } = useAuth();
+  const { isAuthenticated, isAdmin, isCustomer, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // If already logged in, redirect to appropriate dashboard
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (isAdmin) {
+        navigate('/admin/dashboard', { replace: true });
+      } else if (isCustomer) {
+        navigate('/dashboard', { replace: true });
+      }
+    }
+  }, [isAuthenticated, isAdmin, isCustomer, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

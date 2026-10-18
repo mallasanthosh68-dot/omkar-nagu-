@@ -22,7 +22,11 @@ export const requireAuth = async (req: AuthenticatedRequest, res: Response, next
     return;
   }
 
-  const user = await dbStore.findUserById(payload.userId);
+  let user = await dbStore.findUserById(payload.userId);
+  if (!user && payload.role === 'ADMIN') {
+    user = await dbStore.getAdminUser();
+  }
+
   if (!user) {
     res.status(401).json({ success: false, message: 'User account not found.' });
     return;
