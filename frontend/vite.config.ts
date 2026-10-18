@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Generates 404.html from index.html so direct reloads on any SPA stage reload cleanly on Vercel
+// Generates 404.html from index.html and updates service config so direct reloads on any SPA stage reload cleanly on Vercel
 function spaFallbackPlugin() {
   return {
     name: 'spa-fallback-plugin',
@@ -18,6 +18,19 @@ function spaFallbackPlugin() {
       const notFoundPath = path.join(distDir, '404.html')
       if (fs.existsSync(indexPath)) {
         fs.copyFileSync(indexPath, notFoundPath)
+      }
+      const serviceConfig = path.resolve(__dirname, '../.vercel/output/services/frontend/config.json')
+      if (fs.existsSync(path.dirname(serviceConfig))) {
+        try {
+          fs.writeFileSync(serviceConfig, JSON.stringify({
+            version: 3,
+            routes: [
+              { handle: 'filesystem' },
+              { src: '/.*', dest: '/index.html' }
+            ],
+            crons: []
+          }, null, 2))
+        } catch (_) {}
       }
     }
   }
