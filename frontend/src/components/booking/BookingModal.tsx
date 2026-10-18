@@ -132,10 +132,15 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
   // Sync initial user info & preselected options
   useEffect(() => {
-    if (user) {
+    // Only auto-fill for customer accounts; admin should NEVER auto-fill their own details into customer booking fields
+    if (user && user.role !== 'ADMIN') {
       setName(user.name || '');
       setPhone(user.phone || '');
       setAddress(user.address || '');
+    } else {
+      setName('');
+      setPhone('');
+      setAddress('');
     }
 
     if (preselectedService) {
@@ -339,6 +344,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     setCustomServiceTitle('');
     setDescription('');
     setSelectedServices(['House Wiring (New & Complete)']);
+    if (!user || user.role === 'ADMIN') {
+      setName('');
+      setPhone('');
+      setAddress('');
+    }
     onClose();
   };
 
@@ -609,11 +619,24 @@ Example:
               </div>
 
 
-              {/* Customer Details (Auto-filled, editable) */}
+              {/* Customer Details */}
               <div className="pt-2 border-t border-slate-800">
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">
-                  3. Contact & Location Information
-                </label>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3">
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    3. Contact & Location Information
+                  </label>
+                  {user && user.role === 'ADMIN' ? (
+                    <span className="text-[11px] font-medium text-amber-300/90 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full inline-flex items-center gap-1.5 self-start sm:self-auto">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                      Admin Mode — Enter Customer Contact Details
+                    </span>
+                  ) : user ? (
+                    <span className="text-[11px] font-medium text-emerald-400/90 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full inline-flex items-center gap-1.5 self-start sm:self-auto">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                      Auto-filled from your profile (Editable)
+                    </span>
+                  ) : null}
+                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs text-slate-400 mb-1">Customer Full Name</label>
@@ -624,6 +647,7 @@ Example:
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="e.g. Santhosh Kumar"
+                        autoComplete="off"
                         className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 focus:outline-hidden focus:border-[#5B86B6]"
                         required
                       />
@@ -639,6 +663,7 @@ Example:
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="10-digit mobile number"
+                        autoComplete="off"
                         className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 focus:outline-hidden focus:border-[#5B86B6]"
                         required
                       />
@@ -655,6 +680,7 @@ Example:
                       onChange={(e) => setAddress(e.target.value)}
                       rows={2}
                       placeholder="Door / Flat No, Street, Landmark, Visakhapatnam..."
+                      autoComplete="off"
                       className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-100 focus:outline-hidden focus:border-[#5B86B6]"
                       required
                     />

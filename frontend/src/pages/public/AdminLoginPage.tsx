@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Logo } from '../../components/common/Logo';
-import { Shield, User, Lock, AlertCircle, ArrowRight, Sparkles, Eye, EyeOff, Copy, Check } from 'lucide-react';
+import { Shield, User, Lock, AlertCircle, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { Login3DNode } from '../../components/3d/Login3DNode';
 import { TiltCard } from '../../components/effects/TiltCard';
 import { BackButton } from '../../components/common/BackButton';
@@ -11,7 +11,6 @@ export const AdminLoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -35,17 +34,6 @@ export const AdminLoginPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const fillAdminCredentials = () => {
-    setUsername('naguomkar@service.com');
-    setPassword('26152215');
-  };
-
-  const copyAdminCredentials = () => {
-    navigator.clipboard.writeText('Username: naguomkar@service.com\nPassword: 26152215');
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -87,42 +75,6 @@ export const AdminLoginPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Official Admin Access Credentials Box */}
-        <div className="bg-[#0c2b57]/90 border border-sky-400/35 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
-          <div className="text-xs space-y-0.5">
-            <span className="font-bold text-sky-300 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              Admin Access Credentials:
-            </span>
-            <div className="text-sky-100 font-mono text-xs">
-              <span className="text-sky-300/70">Username: </span>
-              <strong className="text-white">naguomkar@service.com</strong> <span className="text-sky-400/60">(or admin)</span>
-            </div>
-            <div className="text-sky-100 font-mono text-xs">
-              <span className="text-sky-300/70">Password: </span>
-              <strong className="text-amber-300 font-bold">26152215</strong>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
-            <button
-              type="button"
-              onClick={copyAdminCredentials}
-              className="p-2 text-xs font-semibold bg-[#071c3b] hover:bg-[#0a2752] text-sky-300 border border-sky-400/30 rounded-xl transition-all shadow-sm active:scale-95 flex items-center gap-1"
-              title="Copy credentials"
-            >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Copied' : 'Copy'}</span>
-            </button>
-            <button
-              type="button"
-              onClick={fillAdminCredentials}
-              className="px-3 py-2 text-xs font-bold bg-sky-400 hover:bg-sky-300 text-slate-950 rounded-xl transition-all shadow-md active:scale-95 hover:scale-105"
-            >
-              Auto-fill
-            </button>
-          </div>
-        </div>
-
         {/* 3D Tilt Form Card */}
         <TiltCard maxTilt={3.5} glare={true} className="rounded-2xl">
           <div className="bg-[#0c2b57]/75 border border-sky-400/25 p-8 rounded-2xl shadow-2xl shadow-[#04142b]/60 space-y-6 backdrop-blur-md">
@@ -133,7 +85,7 @@ export const AdminLoginPage: React.FC = () => {
               </div>
             )}
 
-          <form onSubmit={handleAdminLogin} className="space-y-5">
+          <form onSubmit={handleAdminLogin} className="space-y-5" autoComplete="off">
             <div>
               <label className="block text-xs font-medium text-sky-200/90 mb-1.5">
                 Admin Username / Email
@@ -142,10 +94,15 @@ export const AdminLoginPage: React.FC = () => {
                 <User className="w-4 h-4 absolute left-3.5 top-3 text-sky-400/70" />
                 <input
                   type="text"
+                  name="admin_login_user"
+                  id="admin_login_user"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="e.g. naguomkar@service.com or admin"
-                  autoComplete="username"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck="false"
                   className="w-full bg-[#071c3b]/85 border border-sky-400/30 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 placeholder-sky-300/40 focus:outline-hidden focus:border-sky-400"
                   required
                 />
@@ -160,10 +117,12 @@ export const AdminLoginPage: React.FC = () => {
                 <Lock className="w-4 h-4 absolute left-3.5 top-3 text-sky-400/70" />
                 <input
                   type={showPassword ? 'text' : 'password'}
+                  name="admin_login_secret"
+                  id="admin_login_secret"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter administrator password (26152215)"
-                  autoComplete="current-password"
+                  placeholder="Enter administrator password"
+                  autoComplete="new-password"
                   className="w-full bg-[#071c3b]/85 border border-sky-400/30 rounded-xl pl-10 pr-10 py-2.5 text-sm text-slate-100 placeholder-sky-300/40 focus:outline-hidden focus:border-sky-400"
                   required
                 />

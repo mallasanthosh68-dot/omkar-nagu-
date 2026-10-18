@@ -79,12 +79,12 @@ npm run dev
 
 ### Admin Portal
 * **URL**: [http://localhost:5173/admin/login](http://localhost:5173/admin/login)
-* **Username / Email**: `naguomkar@service.com` *(or click the "Auto-fill" button)*
+* **Username / Email**: `naguomkar@service.com`
 * **Password**: `26152215`
 
 ### Customer Demo Account
 * **URL**: [http://localhost:5173/login](http://localhost:5173/login)
-* **Phone**: `9988776655` *(or click the "Auto-fill" button)*
+* **Phone**: `9988776655`
 * **Password**: `Customer@123`
 
 ---
